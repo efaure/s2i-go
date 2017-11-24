@@ -14,14 +14,12 @@ ENV GO_VERSION=1.${GO_MINOR_VERSION} \
 LABEL io.k8s.description="Platform for building and running Go applications" \
       io.k8s.display-name="Go ${GO_VERSION}" \
       io.openshift.expose-services="8080:http" \
-      io.openshift.tags="builder,go,go1${GO_MINOR_VERSION}"
+      io.openshift.tags="builder,go,go1${GO_MINOR_VERSION}" \
+      io.openshift.s2i.scripts-url="image://${STI_SCRIPTS_PATH}"
+
 
 # Install Go toolchain
-RUN yum install -y centos-release-scl && \
-    INSTALL_PKGS="mercurial" && \
-    yum install -y --setopt=tsflags=nodocs --enablerepo=centosplus $INSTALL_PKGS && \
-    rpm -V $INSTALL_PKGS && \
-    yum clean all -y && \
+RUN yum clean all -y && \
     (curl -L https://storage.googleapis.com/golang/go${GO_VERSION}${GO_PATCH_VERSION:+.}${GO_PATCH_VERSION}.linux-amd64.tar.gz | \
         tar -xz -C /usr/local)
 
