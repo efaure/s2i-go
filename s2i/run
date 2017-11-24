@@ -6,4 +6,4 @@ if [ ! -z "${CUSTOM_BINARY_NAME}" ]; then
   BINARY_NAME=${CUSTOM_BINARY_NAME}
 fi
 
-exec $HOME/$BINARY_NAME
+exec $GOBIN/$BINARY_NAME
