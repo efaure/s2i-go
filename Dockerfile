@@ -8,7 +8,6 @@ ENV GO_MINOR_VERSION=8 \
 ENV GO_VERSION=1.${GO_MINOR_VERSION} \
     GOPATH=$HOME/go \
     GOBIN=$HOME/go/bin \
-    SOURCE=$HOME/go/src/main \
     PATH=$PATH:$HOME/go/bin:/usr/local/go/bin
 
 LABEL io.k8s.description="Platform for building and running Go applications" \

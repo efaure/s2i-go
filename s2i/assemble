@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -e
 
 echo
@@ -13,6 +12,13 @@ function finish {
 }
 trap finish EXIT
 
+if [ -n "$BUILD_SOURCE_PATH" ];  then
+  SOURCE=$GOPATH/src/${BUILD_SOURCE_PATH}
+else 
+  SOURCE_SUB_FOLDER=$(echo $OPENSHIFT_BUILD_SOURCE | sed -n 's/.*\/\/\([^ ]*\).git/\1/p')
+  SOURCE=$GOPATH/src/$SOURCE_SUB_FOLDER
+fi
+
 echo "---> Preparing source..."
 mkdir -p $SOURCE
 
@@ -20,17 +26,32 @@ cp -Rf /tmp/src/. $SOURCE
 
 cd $SOURCE
 
-echo "---> Downloading dependencies..."
-go get -v ./...
+if [ -f "Makefile" ]  &&  [ "${USE_MAKEFILE}" = "true" ]
+then
+    echo " Use make to build the go app"
+    if [ $(grep -E "^build:" Makefile | wc -l) -eq 1 ] ; then
+	  make build -n
+	  make build
+    else 
+	  make -n
+	  make
+    fi
+else
+  echo "Use vanilla go get and go build"
 
-echo "---> Building application source..."
-go build -v -o main
-go install main
+  echo "---> Downloading dependencies..."
+  go get -v ./...
 
+  echo "---> Building application source..."
+  go build -v -o main
 
-echo
+  echo
+fi
 echo "===> Build completed at $(date)"
 
 # Fix source directory permissions
+[ -f "main" ] && chmod g+x main
+[ -f "$(basename ${SOURCE})" ] && chmod g+x $(basename ${SOURCE})
+
 fix-permissions ./
 

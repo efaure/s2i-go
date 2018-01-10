@@ -1,9 +1,24 @@
 #!/bin/bash
 set -e
+args="$*"
+
+
+if [ -n "$BUILD_SOURCE_PATH" ];  then
+  SOURCE=$GOPATH/src/${BUILD_SOURCE_PATH}
+else
+  SOURCE_SUB_FOLDER=$(echo $OPENSHIFT_BUILD_SOURCE | sed -n 's/.*\/\/\([^ ]*\).git/\1/p')
+  SOURCE=$GOPATH/src/$SOURCE_SUB_FOLDER
+fi
+
+cd $SOURCE
 
 BINARY_NAME="*"
 if [ ! -z "${CUSTOM_BINARY_NAME}" ]; then
   BINARY_NAME=${CUSTOM_BINARY_NAME}
+elif  [ -f "$SOURCE/$(basename $(pwd))" ] ; then
+  BINARY_NAME=$(basename $SOURCE)
+else
+  BINARY_NAME=main
 fi
 
-exec $GOBIN/$BINARY_NAME
+exec $SOURCE/$BINARY_NAME $args
