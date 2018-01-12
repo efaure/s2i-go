@@ -12,14 +12,16 @@ function finish {
 }
 trap finish EXIT
 
+
 if [ -n "$BUILD_SOURCE_PATH" ];  then
   SOURCE=$GOPATH/src/${BUILD_SOURCE_PATH}
 else 
-  SOURCE_SUB_FOLDER=$(echo $OPENSHIFT_BUILD_SOURCE | sed -n 's/.*\/\/\([^ ]*\).git/\1/p')
+  SOURCE_SUB_FOLDER=$(echo $OPENSHIFT_BUILD_SOURCE | sed -n 's/.*\/\/\([^ ]*\)/\1/p' | sed 's/.git//g')
   SOURCE=$GOPATH/src/$SOURCE_SUB_FOLDER
 fi
 
-echo "---> Preparing source..."
+
+echo "---> Preparing source in ${SOURCE}..."
 mkdir -p $SOURCE
 
 cp -Rf /tmp/src/. $SOURCE
@@ -53,5 +55,5 @@ echo "===> Build completed at $(date)"
 [ -f "main" ] && chmod g+x main
 [ -f "$(basename ${SOURCE})" ] && chmod g+x $(basename ${SOURCE})
 
-fix-permissions ./
 
+echo "===> End of build"
